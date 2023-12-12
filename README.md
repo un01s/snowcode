@@ -1,6 +1,6 @@
 # code for snowflake and others
 
-## snowflake
+## [snowflake](https://github.com/un01s/snowcode/tree/main/snowflake)
 
 ## others
 
