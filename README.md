@@ -10,6 +10,12 @@ Another way is to switch the code from time to time.
 
 ## reference
 
+* [fastled](https://github.com/FastLED/FastLED)
+
+* [andrew tuline](https://github.com/atuline/FastLED-Demos)
+
+* [s-marley](https://github.com/s-marley/FastLED-basics)
+
 * [Wokwi ldirko](https://wokwi.com/makers/ldirko)
 
 * [Github ldirko](https://github.com/ldirko)
