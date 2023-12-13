@@ -95,7 +95,7 @@ PatternList gPatterns = {
   rainbowbeat,
   twinkle,
   pride,
-  breathe  
+  breathe
 };
 
 void loop() {
@@ -110,20 +110,20 @@ void loop() {
   //twinkle();
   //pride();
   //FastLED.show();
-  
+  /*
   ChangePalettePeriodically();
   uint8_t maxChanges = 24; 
   nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);
-  
+  */
   EVERY_N_SECONDS(60) {
     gCurrentPatternNumber = (gCurrentPatternNumber+1)%ARRAY_SIZE(gPatterns);  
   }
 
   gPatterns[gCurrentPatternNumber]();
 
-  if (gCurrentPatternNumber == 0) {
-    colorMotion += 2; // steps to move     
-  }
+  //if (gCurrentPatternNumber == 0) {
+  //  colorMotion += 2; // steps to move     
+  //}
   FastLED.show();
 }
 
