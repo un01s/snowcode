@@ -35,7 +35,7 @@
 
 #define BRIGHTNESS  64
 #define MIN_BRIGHTNESS  8
-#define MAX_BRIGHTNESS  64 
+#define MAX_BRIGHTNESS  128 
 
 // Global variables can be changed on the fly.
 uint8_t max_bright = 128;                                     // Overall brightness.
@@ -83,8 +83,21 @@ void setup() {
   
 } // setup()
 
-
 void loop() {
+  // breathe
+  //static uint8_t start = 0;
+  //breathe(start);  
+  //start += 16;
+
+  // rainbowmarch
+  //rainbowmarch(200, 10);
+  //rainbowbeat();
+  //fadein();
+  pride();
+  FastLED.show();
+}
+
+void test_loop() {
 
   ChangePalettePeriodically();
   uint8_t maxChanges = 24; 
@@ -187,3 +200,80 @@ void fadein() {
   random16_set_seed(millis());                                                      // Re-randomizing the random number seed for other routines.
 
 } // fadein()
+
+// breathing with changing color
+void breathe(uint8_t start) {
+  uint8_t brightness = (exp(sin(millis() / 2000.0 * PI)) - 0.368) * 42.546;
+  
+  FastLED.setBrightness(brightness);
+  
+  //Serial.println(brightness);
+  uint8_t flag = 1;
+
+  if (brightness < 1 && flag == 1) {
+    for(int i = 0; i < NUM_LEDS; i++) {
+      leds[i] = CHSV((i*20+start)%255,255,255);
+    }
+    flag = 0;
+  }
+  if (brightness > 90 && flag == 0) {
+    flag = 1;  
+  }
+  
+  FastLED.show();      
+}
+
+// this is too fast
+void rainbowmarch(uint8_t thisdelay, uint8_t deltahue) {
+  uint8_t thishue = millis()*(256-thisdelay)/255;
+  //thishue = beatsin8(50,0,255);
+  //thishue = beat8(50); 
+  fill_rainbow(leds, NUM_LEDS, thishue, deltahue);
+}
+
+void rainbowbeat() {
+  uint8_t beatA = beatsin8(17, 0, MAX_BRIGHTNESS);
+  uint8_t beatB = beatsin8(13, 0, MAX_BRIGHTNESS);
+  fill_rainbow(leds, NUM_LEDS, (beatA+beatB)/2, 8);  
+}
+
+void pride() 
+{
+  static uint16_t sPseudotime = 0;
+  static uint16_t sLastMillis = 0;
+  static uint16_t sHue16 = 0;
+ 
+  uint8_t sat8 = beatsin88( 87, 220, 250);
+  uint8_t brightdepth = beatsin88( 341, 96, 224);
+  uint16_t brightnessthetainc16 = beatsin88( 203, (25 * 256), (40 * 256));
+  uint8_t msmultiplier = beatsin88(147, 23, 60);
+
+  uint16_t hue16 = sHue16;//gHue * 256;
+  uint16_t hueinc16 = beatsin88(113, 1, 3000);
+  
+  uint16_t ms = millis();
+  uint16_t deltams = ms - sLastMillis ;
+  sLastMillis  = ms;
+  sPseudotime += deltams * msmultiplier;
+  sHue16 += deltams * beatsin88( 400, 5,9);
+  uint16_t brightnesstheta16 = sPseudotime;
+  
+  for( uint16_t i = 0 ; i < NUM_LEDS; i++) {
+    hue16 += hueinc16;
+    uint8_t hue8 = hue16 / 256;
+
+    brightnesstheta16  += brightnessthetainc16;
+    uint16_t b16 = sin16( brightnesstheta16  ) + 32768;
+
+    uint16_t bri16 = (uint32_t)((uint32_t)b16 * (uint32_t)b16) / 65536;
+    uint8_t bri8 = (uint32_t)(((uint32_t)bri16) * brightdepth) / 65536;
+    bri8 += (255 - brightdepth);
+    
+    CRGB newcolor = CHSV( hue8, sat8, bri8);
+    
+    uint16_t pixelnumber = i;
+    pixelnumber = (NUM_LEDS-1) - pixelnumber;
+    
+    nblend( leds[pixelnumber], newcolor, 64);
+  }
+}
