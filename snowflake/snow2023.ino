@@ -83,6 +83,17 @@ void setup() {
   
 } // setup()
 
+uint8_t gCurrentPatternNumber = 0;
+uint8_t InitNeeded = 1;
+
+#define ARRAY_SIZE(A) (sizeof(A)/sizeof((A)[0]))
+typedef void (*PatternList[])();
+PatternList gPatterns = {
+  rainbowbeat,
+  twinkle,
+  pride  
+};
+
 void loop() {
   // breathe
   //static uint8_t start = 0;
@@ -92,8 +103,19 @@ void loop() {
   // rainbowmarch
   //rainbowmarch(200, 10);
   //rainbowbeat();
-  //fadein();
-  pride();
+  //twinkle();
+  //pride();
+  //FastLED.show();
+  
+  EVERY_N_SECONDS(15) {
+    //fadeOut(50);
+    gCurrentPatternNumber = (gCurrentPatternNumber+1)%ARRAY_SIZE(gPatterns);
+    //InitNeeded = 1;
+    //fadeIn(50);  
+  }
+
+  gPatterns[gCurrentPatternNumber]();
+
   FastLED.show();
 }
 
@@ -104,7 +126,7 @@ void test_loop() {
   nblendPaletteTowardPalette(currentPalette, targetPalette, maxChanges);
   
   static uint8_t startIndex = 0;
-  //fadein();
+  //twinkle();
   FillRingsFromPaletteColors(startIndex);
 
   startIndex = startIndex + 2; /* motion speed */
@@ -188,7 +210,7 @@ void ChangePalettePeriodically()
   }
 }
 
-void fadein() {
+void twinkle() {
 
   random16_set_seed(535);                                                           // The randomizer needs to be re-set each time through the loop in order for the 'random' numbers to be the same each time through.
 
@@ -199,7 +221,7 @@ void fadein() {
 
   random16_set_seed(millis());                                                      // Re-randomizing the random number seed for other routines.
 
-} // fadein()
+} // twinkle()
 
 // breathing with changing color
 void breathe(uint8_t start) {
@@ -276,4 +298,22 @@ void pride()
     
     nblend( leds[pixelnumber], newcolor, 64);
   }
+}
+
+void fadeIn(byte steps) {
+  for (byte i = steps+1; i>=0; i--) {
+    gPatterns[gCurrentPatternNumber]();
+    byte fadeOut = lerp8by8(MAX_BRIGHTNESS, 0, 255*i/steps);
+    FastLED.setBrightness(fadeOut);
+    FastLED.show();
+  }  
+}
+
+void fadeOut(byte steps) {
+  for (byte i = 0; i<=steps; i++) {
+    gPatterns[gCurrentPatternNumber]();
+    byte fadeOut = lerp8by8(MAX_BRIGHTNESS, 0, 255*i/steps);
+    FastLED.setBrightness(fadeOut);
+    FastLED.show();
+  }  
 }
