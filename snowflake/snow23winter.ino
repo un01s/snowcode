@@ -16,9 +16,9 @@
 // soft settings
 #define BRIGHTNESS  64
 #define MIN_BRIGHTNESS  8
-#define MAX_BRIGHTNESS  64 
+#define MAX_BRIGHTNESS  128 
 // Global variables can be changed on the fly
-uint8_t max_bright = 128;    // Overall brightness.
+uint8_t MAX_BRIGHTNESS = 128;    // Overall brightness.
 
 struct CRGB leds[NUM_LEDS];  // Initialize our LED array.
 
@@ -58,7 +58,7 @@ void setup() {
 
   LEDS.addLeds<LED_TYPE,LED_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
  
-  FastLED.setBrightness(max_bright);
+  FastLED.setBrightness(MAX_BRIGHTNESS);
   FastLED.setMaxPowerInVoltsAndMilliamps(5, 500);               // FastLED Power management set at 5V, 500mA.
   
 } // setup()
@@ -169,8 +169,23 @@ void fadein() {
 } // fadein()
 
 void breathe() {
+  CRGB colors[7] = {
+    CRGB::RED,
+    CRGB::PURPLE,
+    CRGB::YELLOW,
+    CRGB::GREEN,
+    CRGB::ORANGE,
+    CRGB::Blue,
+    CRGB::White
+  };
+  
+  
   uint8_t brightness = (exp(sin(millis() / 2000.0 * PI)) - 0.368) * 42.546;
   FastLED.setBrightness(brightness);
-  leds[0] = CRGB::Red;
+  //for (int j = 0; j < 7; j++) {
+    for (int i = 0; i<NUM_LEDS; i++) {
+      leds[i] = colors[0];
+    }
+  //}
   FastLED.show();
 }
