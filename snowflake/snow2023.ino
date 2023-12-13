@@ -80,6 +80,8 @@ void setup() {
  
   FastLED.setBrightness(max_bright);
   FastLED.setMaxPowerInVoltsAndMilliamps(5, 500);               // FastLED Power management set at 5V, 500mA.
+
+  SetupMyPalette();
   
 } // setup()
 
@@ -91,6 +93,7 @@ static uint8_t colorMotion = 0;
 #define ARRAY_SIZE(A) (sizeof(A)/sizeof((A)[0]))
 typedef void (*PatternList[])();
 PatternList gPatterns = {
+  ringout,
   pacifica_loop,
   rainbowbeat,
   twinkle,
@@ -121,9 +124,9 @@ void loop() {
 
   gPatterns[gCurrentPatternNumber]();
 
-  //if (gCurrentPatternNumber == 0) {
-  //  colorMotion += 2; // steps to move     
-  //}
+  if (gCurrentPatternNumber == 0) {
+    colorMotion += 2; // steps to move     
+  }
   FastLED.show();
 }
 
@@ -148,17 +151,16 @@ void test_loop() {
 //void FillRingsFromPaletteColors( uint8_t colorIndex)
 void ringout()
 {
-    uint8_t steps = (millis()/500)%2;
+    uint8_t steps = (millis()/125)%256;
     
-    if (steps == 1) {
     uint8_t colorIndex = colorMotion;
     // LINEARBLEND is better than NOBLEND, it makes the animation smoother.
     uint8_t i, j, index;
-    CRGB c1 = ColorFromPalette( currentPalette, colorIndex, MAX_BRIGHTNESS, LINEARBLEND);
-    CRGB c2 = ColorFromPalette( currentPalette, (colorIndex+4)%256, MAX_BRIGHTNESS, LINEARBLEND);
-    CRGB c3 = ColorFromPalette( currentPalette, (colorIndex+8)%256, MAX_BRIGHTNESS, LINEARBLEND);
-    CRGB c4 = ColorFromPalette( currentPalette, (colorIndex+16)%256, MAX_BRIGHTNESS, LINEARBLEND);
-    CRGB c5 = ColorFromPalette( currentPalette, (colorIndex+20)%256, MAX_BRIGHTNESS, LINEARBLEND);
+    CRGB c1 = ColorFromPalette( currentPalette, (steps)%256, MAX_BRIGHTNESS, LINEARBLEND);
+    CRGB c2 = ColorFromPalette( currentPalette, (steps+4)%256, MAX_BRIGHTNESS, LINEARBLEND);
+    CRGB c3 = ColorFromPalette( currentPalette, (steps+8)%256, MAX_BRIGHTNESS, LINEARBLEND);
+    CRGB c4 = ColorFromPalette( currentPalette, (steps+12)%256, MAX_BRIGHTNESS, LINEARBLEND);
+    CRGB c5 = ColorFromPalette( currentPalette, (steps+16)%256, MAX_BRIGHTNESS, LINEARBLEND);
 
     for (i = 0; i < 5; i++) {
       for (j = 0; j < 6; j++) {
@@ -189,8 +191,7 @@ void ringout()
             break;
         }
       }
-      colorIndex += 2; // 4, small steps better?
-    }
+      //colorIndex += 2; // 4, small steps better?
     }
 }
 
@@ -239,11 +240,13 @@ void SetupMyPalette()
     CRGB o = CHSV( HUE_ORANGE, 255, 255);
     CRGB g = CHSV( HUE_GREEN, 255, 255);
     CRGB b = CRGB::Blue;
-    
+    /*
     currentPalette = CRGBPalette16(g, g, r,  r,
                                    y, y, b,  b,
                                    p, p, r,  b,
                                    b, r, b,  y);
+    */                               
+    currentPalette = RainbowColors_p;
 }
 
 void twinkle() {
